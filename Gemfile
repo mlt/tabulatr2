@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'jquery-rails'
+gem 'turbolinks'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 group :development, :test do

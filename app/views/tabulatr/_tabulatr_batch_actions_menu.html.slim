@@ -37,6 +37,7 @@
           - extension = data[:extension]
         li
           = link_to label, '#', class: "batch-action-inputs", data: { \
+              "turbolinks" => false, \
               "do-batch-action-name" => iname, \
               "do-batch-action" => key, \
               "table-id" => table_id, \

@@ -9,21 +9,6 @@ function Tabulatr(id){
   this.hasInfiniteScrolling = false;
 }
 
-var tabulatr_tables;
-
-var cbfn = function(event, isInView, visiblePartX, visiblePartY) {
-  if (isInView && visiblePartY !== 'top' && visiblePartY !== 'bottom') {
-    var tableId = $(event.currentTarget).data('table');
-    var table_obj;
-    for(var i = 0; i < tabulatr_tables.length; i++){
-      if(tabulatr_tables[i].id === tableId){
-        table_obj = tabulatr_tables[i];
-      }
-    }
-    table_obj.updateTable({append: true});
-  }
-};
-
 Tabulatr.prototype = {
   constructor: Tabulatr,
 
@@ -208,8 +193,7 @@ Tabulatr.prototype = {
 
   submitFilterForm: function(){
     if(this.hasInfiniteScrolling){
-      $('.pagination_trigger[data-table='+ this.id +']').unbind('inview', cbfn);
-      $('.pagination_trigger[data-table='+ this.id +']').bind('inview', cbfn);
+      $('.pagination_trigger[data-table='+ this.id +']').addClass('inview');;
     }
     this.updateTable({page: 1, append: false}, true);
     return false;
@@ -295,7 +279,7 @@ Tabulatr.prototype = {
     }
     if(dataCount === 0 || this.currentCount() + dataCount >= actualCount){
       this.moreResults = false;
-      $('.pagination_trigger[data-table='+ tableId +']').unbind('inview');
+      $('.pagination_trigger[data-table='+ tableId +']').removeClass('inview');
     }
   }
 
