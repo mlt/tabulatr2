@@ -4,8 +4,8 @@ class VendorTabulatrData < Tabulatr::Data
   column :url
   column :active, :editable => true
 
-  def self.editable?(record, name)
-    record.name == 'ven d\'or' or name == 'active'
+  def self.editable?(view, name)
+    (view.record.name == 'ven d\'or' or name == 'active') and view.controller
   end
 
   filter :product_price_range do |relation, value|
