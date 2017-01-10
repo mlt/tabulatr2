@@ -39,6 +39,7 @@ module Tabulatr::Data::DSL
     table_column = Tabulatr::Renderer::Column.from(
         name: name,
         klass: @base,
+        proxy: self,
         col_options: Tabulatr::ParamsBuilder.new(opts),
         table_name: main_class.table_name.to_sym,
         output: block_given? ? block : ->(record){record.send(name)})
@@ -59,6 +60,7 @@ module Tabulatr::Data::DSL
     table_column = Tabulatr::Renderer::Association.from(
         name: name,
         klass: assoc_klass,
+        proxy: self,
         col_options: Tabulatr::ParamsBuilder.new(opts),
         table_name: assoc.join('-').to_sym,
         output: block_given? ? block : lambda do |record|

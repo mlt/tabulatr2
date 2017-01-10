@@ -86,6 +86,11 @@ class Tabulatr::Data
     found
   end
 
+  # override me in your tabulatr data
+  def self.editable?(record, name)
+    false
+  end
+
   def execute_batch_actions batch_param, selected_ids
     if batch_param.present? && @batch_actions.present?
       batch_param = batch_param.keys.first.to_sym if batch_param.is_a?(Hash)

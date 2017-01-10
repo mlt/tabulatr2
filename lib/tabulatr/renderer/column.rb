@@ -25,7 +25,7 @@
 class Tabulatr::Renderer::Column
   include ActiveModel::Model
 
-  attr_accessor *%i{name klass table_name col_options output block}
+  attr_accessor *%i{name klass proxy table_name col_options output block}
 
   delegate :filter, to: :col_options
 
@@ -34,6 +34,7 @@ class Tabulatr::Renderer::Column
     table_name: nil,
     col_options: nil,
     klass: nil,
+    proxy: nil,
     output: nil,
     &block)
     self.new(
@@ -41,6 +42,7 @@ class Tabulatr::Renderer::Column
       table_name: table_name,
       col_options: col_options,
       klass: klass,
+      proxy: proxy,
       output: output,
       block: block
     )
@@ -69,7 +71,9 @@ class Tabulatr::Renderer::Column
   def action?() false end
 
   def value_for(record, view)
-    unless col_options.editable.nil?
+    val = value_for_imp(record, view)
+    if col_options.editable and proxy.editable?(record, name.to_s)
+      col_options.editable = {} unless col_options.editable.is_a?(Hash)
       options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(col_options.editable).with_indifferent_access
       options.merge! options.delete(:data){ Hash.new }
       url = options.delete(:url)
@@ -78,7 +82,7 @@ class Tabulatr::Renderer::Column
       else
         url = view.send(url, record.id)
       end
-      view.content_tag :span, value_for_imp(record, view), :class => :editable,
+      view.content_tag :span, val, :class => :editable,
         id: name,
         :data => {
                   url: url,
@@ -87,7 +91,8 @@ class Tabulatr::Renderer::Column
                   model: record.class.model_name.singular
                  }
     else
-      value_for_imp(record, view)
+      # .to_s ? somehow 'false' renders to nothing
+      "#{val}"
     end
   end
 
