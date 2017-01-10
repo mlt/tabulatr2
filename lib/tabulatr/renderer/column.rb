@@ -76,20 +76,32 @@ class Tabulatr::Renderer::Column
       col_options.editable = {} unless col_options.editable.is_a?(Hash)
       options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(col_options.editable).with_indifferent_access
       options.merge! options.delete(:data){ Hash.new }
+      nested  = options.delete(:nested)
+      nid     = options.delete(:nid)
+      title   = options.delete(:title){ human_name() }
+      placeholder = options.delete(:placeholder){ title }
+      source  = options[:source] ? format_source(options.delete(:source), val) : default_source_for(val)
       url = options.delete(:url)
       if url.nil?
         url = view.polymorphic_path(record)
       else
         url = view.send(url, record.id)
       end
+      type = options.delete(:type){ default_type_for(val) }
       view.content_tag :span, val, :class => :editable,
         id: name,
         :data => {
                   url: url,
                   name: name,
                   pk: record.id,
+                  title: title,
+                  placeholder: placeholder,
+                  source: source,
+                  nested: nested,
+                  nid:    nid,
+                  type: type,
                   model: record.class.model_name.singular
-                 }
+                 }.merge(options.symbolize_keys)
     else
       # .to_s ? somehow 'false' renders to nothing
       "#{val}"
@@ -155,6 +167,44 @@ class Tabulatr::Renderer::Column
     when Proc   then col_options.format.(value)
     else value
     end
+  end
+
+  # taken from x-editable-rails\lib\x-editable-rails\view_helpers.rb
+  # can we optionally mixin that module??
+  def default_type_for(value)
+    case value
+    when TrueClass, FalseClass
+      'select'
+    when Array
+      'checklist'
+    when Date
+      'date'
+    else
+      'text'
+    end
+  end
+
+  def default_source_for(value)
+    case value
+    when TrueClass, FalseClass
+      { '1' => 'Yes', '0' => 'No' }
+    end
+  end
+
+  # helper method that take some shorthand source definitions and reformats them
+  def format_source(source, value)
+    formatted_source = case value
+                       when TrueClass, FalseClass
+                         if source.is_a?(Array) && source.first.is_a?(String) && source.size == 2
+                           { '1' => source[0], '0' => source[1] }
+                         end
+                       else
+                         if source.is_a?(Array) && source.first.is_a?(String)
+                           source.map { |v| { value: v, text: v } }
+                         end
+                       end
+
+    formatted_source || source
   end
 
 end
