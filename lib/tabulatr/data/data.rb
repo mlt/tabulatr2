@@ -87,7 +87,7 @@ class Tabulatr::Data
   end
 
   # override me in your tabulatr data
-  def self.editable?(record, name)
+  def self.editable?(view, name)
     false
   end
 

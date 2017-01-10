@@ -72,7 +72,7 @@ class Tabulatr::Renderer::Column
 
   def value_for(record, view)
     val = value_for_imp(record, view)
-    if col_options.editable and proxy.editable?(record, name.to_s)
+    if col_options.editable and proxy.editable?(view, name.to_s)
       col_options.editable = {} unless col_options.editable.is_a?(Hash)
       options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(col_options.editable).with_indifferent_access
       options.merge! options.delete(:data){ Hash.new }
