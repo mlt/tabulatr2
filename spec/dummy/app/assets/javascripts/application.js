@@ -14,4 +14,21 @@
 //= require bootstrap
 //= require tabulatr
 //= require turbolinks
+//= require editable/bootstrap-editable
+//= require editable/rails
 //= require_tree .
+
+$(document).on('tabulatr:response', function() {
+  $('.editable').editable({
+    // Here is an idea of what we would do without editable/rails & coffee
+    // ajaxOptions: {
+    //   type: 'put'
+    // },
+    // params: function(params) {  //params already contain `name`, `value` and `pk`
+    //   var data = {};
+    //   data['id'] = params.pk;
+    //   data[params.name] = params.value;
+    //   return data;
+    // }
+  });
+})

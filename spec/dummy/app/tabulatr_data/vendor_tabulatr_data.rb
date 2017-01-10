@@ -1,8 +1,8 @@
 class VendorTabulatrData < Tabulatr::Data
 
-  column :name
+  column :name, :editable => { :url => 'vendor_path' }
   column :url
-  column :active
+  column :active, :editable => {}
 
   filter :product_price_range do |relation, value|
     relation = relation.joins(:products)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #--
 # Copyright (c) 2010-2014 Peter Horn & Florian Thomas, metaminded UG
 #
@@ -68,6 +69,29 @@ class Tabulatr::Renderer::Column
   def action?() false end
 
   def value_for(record, view)
+    unless col_options.editable.nil?
+      options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(col_options.editable).with_indifferent_access
+      options.merge! options.delete(:data){ Hash.new }
+      url = options.delete(:url)
+      if url.nil?
+        url = view.polymorphic_path(record)
+      else
+        url = view.send(url, record.id)
+      end
+      view.content_tag :span, value_for_imp(record, view), :class => :editable,
+        id: name,
+        :data => {
+                  url: url,
+                  name: name,
+                  pk: record.id,
+                  model: record.class.model_name.singular
+                 }
+    else
+      value_for_imp(record, view)
+    end
+  end
+
+  def value_for_imp(record, view)
     val = principal_value(record, view)
     if self.col_options.format.present?
       if val.respond_to?(:to_ary)
