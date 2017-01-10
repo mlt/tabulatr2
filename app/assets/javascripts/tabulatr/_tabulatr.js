@@ -119,6 +119,7 @@ Tabulatr.prototype = {
         this.updateTable({page: response.meta.pages});
       }
     }
+    $('#'+this.id).trigger('tabulatr:response');
   },
 
   handleError: function(){

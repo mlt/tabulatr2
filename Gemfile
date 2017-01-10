@@ -4,6 +4,10 @@ gemspec
 
 gem 'jquery-rails'
 gem 'turbolinks'
+gem 'x-editable-rails', '~> 1.5.1'
+gem 'jbuilder', '~> 2.0'
+# x-editable-rails depends on coffee for some ajax form mumbo jumbo with data-model and more
+gem 'coffee-rails', '~> 4.0.0'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 group :development, :test do

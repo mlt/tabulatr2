@@ -1,6 +1,6 @@
 module Tabulatr
   class ParamsBuilder
-    ALLOWED_PARAMS    = [:header, :filter, :sortable, :data_html,
+    ALLOWED_PARAMS    = [:header, :filter, :sortable, :data_html, :editable,
                          :header_html, :filter_sql, :sort_sql, :sql, :width,
                          :align, :wrap, :format, :filter_label, :name, :classes]
     DEPRECATED_PARAMS = []
