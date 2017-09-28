@@ -27,20 +27,22 @@
   .tabulatr-filter-col data-table-id=table_id
     = render '/tabulatr/tabulatr_filter_dialog', opts
   .tabulatr-table-col.col-xs-12 data-table-id=table_id
-    .tabulatr-table-controls-wrapper.row.tabulatr-table-controls-wrapper-top data-table-id=table_id
-      .tabulatr-filter-menu-wrapper.col-xs-3.col-sm-1 data-table-id=table_id
-        = render '/tabulatr/tabulatr_filter_menu', opts
+    - if table_options[:filter] or table_options[:batch_actions] or tabulatr_data.search? \
+    or (table_options[:paginate] and table_options[:pagination_position].in?([:top, :both]))
+      .tabulatr-table-controls-wrapper.row.tabulatr-table-controls-wrapper-top data-table-id=table_id
+        .tabulatr-filter-menu-wrapper.col-xs-3.col-sm-1 data-table-id=table_id
+          = render '/tabulatr/tabulatr_filter_menu', opts
 
-      .tabulatr-batch-actions-menu-wrapper.col-xs-3.col-sm-1 data-table-id=table_id
-        = render '/tabulatr/tabulatr_batch_actions_menu', opts
+        .tabulatr-batch-actions-menu-wrapper.col-xs-3.col-sm-1 data-table-id=table_id
+          = render '/tabulatr/tabulatr_batch_actions_menu', opts
 
-      - if tabulatr_data.search?
-        .tabulatr-fuzzy-search-field-wrapper.col-xs-6.col-sm-2 data-table-id=table_id
-          = render '/tabulatr/tabulatr_fuzzy_search_field', opts
+        - if tabulatr_data.search?
+          .tabulatr-fuzzy-search-field-wrapper.col-xs-6.col-sm-2 data-table-id=table_id
+            = render '/tabulatr/tabulatr_fuzzy_search_field', opts
 
-      - if table_options[:pagination_position].in?([:top, :both])
-        .tabulatr-paginator-wrapper.col-xs-12.col-sm-8 data-table-id=table_id
-          = render '/tabulatr/tabulatr_paginator', opts
+        - if table_options[:pagination_position].in?([:top, :both])
+          .tabulatr-paginator-wrapper.col-xs-12.col-sm-8 data-table-id=table_id
+            = render '/tabulatr/tabulatr_paginator', opts
 
 
     - if table_options[:counter_position].in?([:top, :both])
