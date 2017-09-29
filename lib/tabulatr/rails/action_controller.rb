@@ -27,10 +27,27 @@ class ActionController::Base
   end
 
   def tabulatr_for(relation, tabulatr_data_class: nil, serializer: nil, render_action: nil, default_order: nil, locals: {}, &block)
+    if relation.is_a?(Array)
+      table_id = params[:table_id]
+      idx = nil
+      if table_id
+        controller_path = self.class.name.underscore.gsub('/', '-')
+        idx = relation.index do |r|
+          n = "#{Tabulatr::Utility.formatted_name(r.name)}_table_#{controller_path}_#{self.action_name}_"
+          table_id.start_with? n
+        end
+      end
+      if idx
+        relation = relation[idx]
+      else
+        render action: render_action || action_name
+        return
+      end
+    end
     klass = relation.respond_to?(:klass) ? relation.klass : relation
     locals[:current_user] ||= current_user if respond_to?(:current_user)
     if batch_params(klass, params).present?
-      response = klass.tabulatr(relation, tabulatr_data_class).data_for_table(params, locals: locals, controller: self, &block)
+      response = klass.tabulatr(relation, tabulatr_data_class).data_for_table(params, locals: locals, controller: self, default_order: default_order, &block)
       case response
       when Tabulatr::Responses::RawResponse
         return send_data response.data, response.options
