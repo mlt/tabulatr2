@@ -2,6 +2,8 @@ en:
   tabulatr:
     rows_per_page: 'No. of rows per page:'
     filter: 'Filter'
+    remove_filters: 'Remove'
+    reset_filters: 'Reset'
     batch_actions: 'Batch actions'
     count: 'Showing: %{current} of total %{total}. %{per_page} items per page.'
     apply_filters: 'Apply'

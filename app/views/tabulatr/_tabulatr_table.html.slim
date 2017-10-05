@@ -23,7 +23,7 @@
     klass: klass, classname: classname, table_id: table_id,
     formatted_name: formatted_name, filter: filter }
 
-.row.tabulatr-outer-wrapper data-table-id=table_id
+.row.tabulatr-outer-wrapper data-table-id=table_id class=('filtered' if table_options[:filter].is_a?(Hash))
   .tabulatr-filter-col data-table-id=table_id
     = render '/tabulatr/tabulatr_filter_dialog', opts
   .tabulatr-table-col.col-xs-12 data-table-id=table_id

@@ -4,6 +4,10 @@ class ProductsController < ApplicationController
     tabulatr_for Product
   end
 
+  def prefilter
+    tabulatr_for Product
+  end
+
   def one_item_per_page_with_pagination
     @pagination = true
     tabulatr_for Product, render_action: 'one_item_per_page'
