@@ -259,6 +259,14 @@ feature "Tabulatr" do
 #      wait_for_ajax
       expect(page).to have_css(".tabulatr_table tbody tr", count: 0, wait: 10)
     end
+
+    scenario 'pre-filter', js: true do
+      names.each do |n|
+        Product.create!(:title => n, :active => true, :price => 10.0)
+      end
+      visit prefilter_products_path
+      expect(page).to have_css(".tabulatr_table tbody tr", count: 3)
+    end
   end
 
   feature "Sorting" do

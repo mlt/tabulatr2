@@ -2,6 +2,8 @@ en:
   tabulatr:
     rows_per_page: 'No. of rows per page:'
     filter: 'Filter'
+    remove_filters: 'Remove'
+    reset_filters: 'Reset'
     batch_actions: 'Batch actions'
     count: 'Showing: %{current} of total %{total}. %{per_page} items per page.'
     apply_filters: 'Apply'
@@ -22,7 +24,7 @@ en:
       'no': No
     enum_filter:
       none: ''
-    no_data_for_table: No Data
+    batch_confirm_text: This action will be applied to all rows within the current filter
 
 de:
   tabulatr:
@@ -48,4 +50,4 @@ de:
       'no': Nein
     enum_filter:
       none: ''
-    no_data_for_table: Keine Daten
+    batch_confirm_text: Diese Aktion wird auf allen Datensatzen im aktuallen Filter ausgefuhrt

@@ -61,6 +61,7 @@ Tabulatr.prototype = {
     var data;
     if(this.initialRequest && this.isAPersistedTable && localStorage[this.id]){
       data = JSON.parse(localStorage[this.id]);
+      data = this.readParamsFromForm(data);
     }else{
       data = this.createParameterString(hash, this.id);
       if(this.isAPersistedTable) {
@@ -211,6 +212,7 @@ Tabulatr.prototype = {
     }).filter(function(n){return n; }).join();
     hash.table_id = this.id;
     hash[tableName + '_search'] = $('input#'+ this.id +'_fuzzy_search_query').val();
+    hash[tableName + '_sort'] = $('table#'+ this.id).data('sort_by');
     return this.readParamsFromForm(hash);
   },
 
@@ -257,16 +259,18 @@ Tabulatr.prototype = {
   },
 
   readParamsFromForm: function(hash){
-    var form_array = $('.tabulatr_filter_form[data-table="'+ this.id +'"]')
-      .find('input:visible,select:visible,input[type=hidden]').serializeArray();
-    for(var i = 0; i < form_array.length; i++){
-      if(hash[form_array[i].name] !== undefined){
-        if(!Array.isArray(hash[form_array[i].name])){
-          hash[form_array[i].name] = [hash[form_array[i].name]];
+    if($('.tabulatr-outer-wrapper.filtered[data-table-id="' + this.id + '"]').length > 0) {
+      var form_array = $('.tabulatr_filter_form[data-table="'+ this.id +'"]')
+          .find('input,select,input[type=hidden]').serializeArray();
+      for(var i = 0; i < form_array.length; i++){
+        if(hash[form_array[i].name] !== undefined){
+          if(!Array.isArray(hash[form_array[i].name])){
+            hash[form_array[i].name] = [hash[form_array[i].name]];
+          }
+          hash[form_array[i].name].push(form_array[i].value);
+        }else{
+          hash[form_array[i].name] = form_array[i].value;
         }
-        hash[form_array[i].name].push(form_array[i].value);
-      }else{
-        hash[form_array[i].name] = form_array[i].value;
       }
     }
     return hash;
