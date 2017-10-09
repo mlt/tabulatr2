@@ -20,6 +20,7 @@ describe Tabulatr::Data::Filtering do
       @last_thirty_days = Product.create!(publish_at: DateTime.new(2013, 12, 3, 0, 0))
       @outside_last_thirty_days = Product.create!(publish_at: DateTime.new(2013, 12, 2, 23, 59))
       @this_month = Product.create!(publish_at: DateTime.new(2014, 1, 15, 0, 0))
+      @this_year = Product.create!(publish_at: DateTime.new(2014, 2, 15, 0, 0))
       @next_year = Product.create!(publish_at: DateTime.new(2015, 1, 1, 12, 0))
       allow(Date).to receive(:today).and_return(Date.new(2014,1,1))
     end
@@ -66,6 +67,14 @@ describe Tabulatr::Data::Filtering do
       @dummy.apply_date_condition(fake_obj, {'simple'=>'this_month'})
       result = @dummy.instance_variable_get('@relation')
       expect(result.map(&:id).sort).to eq ([@today.id, @week_two.id, @this_month.id])
+    end
+
+    it "filters for 'this year'" do
+      fake_obj = double()
+      allow(fake_obj).to receive_message_chain('col_options.filter_sql') { 'publish_at'}
+      @dummy.apply_date_condition(fake_obj, {'simple'=>'this_year'})
+      result = @dummy.instance_variable_get('@relation')
+      expect(result.map(&:id).sort).to eq ([@today.id, @week_two.id, @this_month.id, @this_year.id])
     end
 
     it "filters for 'last 30 days'" do

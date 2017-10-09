@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #--
 # Copyright (c) 2010-2014 Peter Horn & Florian Thomas, metaminded UG
 #
@@ -83,6 +84,8 @@ module Tabulatr::Data::Filtering
     when 'last_7_days' then date_in_between((today - 6.day).beginning_of_day, today.at_end_of_day, n)
     when 'this_month' then date_in_between(today.at_beginning_of_month.beginning_of_day,
                               today.at_end_of_month.end_of_day, n)
+    when 'this_year' then date_in_between(today.at_beginning_of_year.beginning_of_day,
+                              today.at_end_of_year.end_of_day, n)
     when 'last_30_days' then date_in_between((today - 29.day).beginning_of_day, today.at_end_of_day, n)
     when 'from_to' then date_in_between((Date.parse(cond['from']) rescue nil), (Date.parse(cond['to']) rescue nil), n)
     end
