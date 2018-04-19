@@ -46,7 +46,7 @@ class Tabulatr::Data::ButtonBuilder
   end
 
   def button(icon, path, options={})
-    label = options.dup.delete(:label)
+    label = options.delete(:label)
     if @mode == :buttons
       @buttons << {icon: icon, label: label, path: path, options: options}
     else
