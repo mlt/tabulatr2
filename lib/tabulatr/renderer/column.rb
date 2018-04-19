@@ -72,10 +72,12 @@ class Tabulatr::Renderer::Column
 
   def value_for(record, view)
     val = value_for_imp(record, view)
-    if col_options.editable and proxy.editable?(view, name.to_s)
-      col_options.editable = {} unless col_options.editable.is_a?(Hash)
-      options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(col_options.editable).with_indifferent_access
-      options.merge! options.delete(:data){ Hash.new }
+    editable_options = col_options.editable.is_a?(Hash) ? col_options.editable : {}
+    # Typically we edit underlying association object unless we are selecting an item
+    record = record.send(table_name) if association? and editable_options[:type] != 'select'
+    if col_options.editable and proxy.editable?(view, name.to_s) and not record.nil?
+      options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(editable_options).with_indifferent_access
+      options.delete(:data)
       nested  = options.delete(:nested)
       nid     = options.delete(:nid)
       title   = options.delete(:title){ human_name() }
