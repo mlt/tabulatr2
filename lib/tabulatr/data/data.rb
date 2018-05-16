@@ -51,7 +51,7 @@ class Tabulatr::Data
     @default_order = default_order
 
     # count
-    total = @relation.count
+    total = @relation.count(:all)
 
     # prepare the query
     apply_filters(filter_params params)

@@ -28,7 +28,7 @@ module Tabulatr::Data::Pagination
   end
 
   def compute_pagination(page, pagesize)
-    count = @relation.count
+    count = @relation.count(:all)
     count = count.count if count.is_a?(Hash)
     page ||= 1
     pagesize, page = pagesize.to_i, page.to_i
