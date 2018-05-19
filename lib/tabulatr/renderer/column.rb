@@ -73,41 +73,54 @@ class Tabulatr::Renderer::Column
   def value_for(record, view)
     val = value_for_imp(record, view)
     editable_options = col_options.editable.is_a?(Hash) ? col_options.editable : {}
+    # .to_s ? somehow 'false' renders to nothing
+    return "#{val}" unless col_options.editable and proxy.editable?(view, name.to_s)
+    options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(editable_options).with_indifferent_access
+    want_select = options.has_key?(:type) and options[:type].to_sym.eql?(:select)
     # Typically we edit underlying association object unless we are selecting an item
-    record = record.send(table_name) if association? and editable_options[:type] != 'select'
-    if col_options.editable and proxy.editable?(view, name.to_s) and not record.nil?
-      options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(editable_options).with_indifferent_access
-      options.delete(:data)
-      nested  = options.delete(:nested)
-      nid     = options.delete(:nid)
-      title   = options.delete(:title){ human_name() }
-      placeholder = options.delete(:placeholder){ title }
-      source  = options[:source] ? format_source(options.delete(:source), val) : default_source_for(val)
-      url = options.delete(:url)
-      if url.nil?
-        url = view.polymorphic_path(record)
-      else
-        url = view.send(url, record.id)
+    if association?
+      assoc = table_name.to_s.split('-').map(&:to_sym)
+      a = assoc.pop if want_select
+      record = assoc.reduce(record) { |cur,nxt| cur.try(:send, nxt) }
+      if want_select
+        value = record.try(a).try(:id)
+        source = options.delete(:source)
+        if source
+          source = view.instance_eval(source.to_s) if source.is_a?(Symbol)
+        else
+          klass = record.class.reflect_on_association(a).klass
+          source = klass ? view.polymorphic_path(klass, format: :json) : default_source_for(val)
+        end
       end
-      type = options.delete(:type){ default_type_for(val) }
-      view.content_tag :span, val, :class => :editable,
-        id: name,
-        :data => {
-                  url: url,
-                  name: name,
-                  pk: record.id,
-                  title: title,
-                  placeholder: placeholder,
-                  source: source,
-                  nested: nested,
-                  nid:    nid,
-                  type: type,
-                  model: record.class.model_name.singular
-                 }.merge(options.symbolize_keys)
-    else
-      # .to_s ? somehow 'false' renders to nothing
-      "#{val}"
     end
+    return "#{val}" if record.nil?
+    options.delete(:data)
+    nested  = options.delete(:nested)
+    nid     = options.delete(:nid)
+    title   = options.delete(:title){ human_name() }
+    placeholder = options.delete(:placeholder){ title }
+    url = options.delete(:url)
+    if url.nil?
+      url = view.polymorphic_path(record)
+    else
+      url = view.send(url, record.id)
+    end
+    type = options.delete(:type){ default_type_for(val) }
+    view.content_tag :span, val, :class => :editable,
+      id: name,
+      :data => {
+                url: url,
+                name: name,
+                pk: record.id,
+                title: title,
+                placeholder: placeholder,
+                value: (value if want_select),
+                source: (source if want_select),
+                nested: nested,
+                nid:    nid,
+                type: type,
+                model: record.class.model_name.singular
+               }.merge(options.symbolize_keys).compact
   end
 
   def value_for_imp(record, view)
