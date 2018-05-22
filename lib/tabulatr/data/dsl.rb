@@ -46,6 +46,24 @@ module Tabulatr::Data::DSL
     @table_columns << table_column
   end
 
+  def partial(name, opts = {}, &block)
+    @table_columns ||= []
+    sql_options = determine_sql(opts, main_class.quoted_table_name, name)
+    opts = {
+            sort_sql: sql_options[:sort_sql],
+            filter: false,
+            sortable: false,
+            filter_sql: sql_options[:filter_sql]}.merge(opts)
+    table_column = Tabulatr::Renderer::Column.from(
+        name: name,
+        klass: @base,
+        proxy: self,
+        col_options: Tabulatr::ParamsBuilder.new(opts),
+        table_name: main_class.table_name.to_sym,
+        output: block_given? ? block : ->(record){ self.controller.render_to_string partial: name.to_s, formats: [:html], object: record })
+    @table_columns << table_column
+  end
+
   def association(assoc, name, opts = {}, &block)
     @table_columns ||= []
     unless assoc.is_a?(Array)
