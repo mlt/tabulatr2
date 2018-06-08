@@ -34,6 +34,8 @@
 
   $(document).on('click', '.batch-action-inputs', function(){
     var a = $(this);
+    if(a.attr('id')) // user wants specific action and has a handler for it
+      return;
     var name = a.data('do-batch-action-name');
     var key = a.data('do-batch-action');
     var tableId = a.data('table-id');
