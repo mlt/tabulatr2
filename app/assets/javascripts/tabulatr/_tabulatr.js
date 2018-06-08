@@ -107,7 +107,12 @@ Tabulatr.prototype = {
     return $('#'+ this.id +' tbody tr.tabulatr-row').length;
   },
 
-  handleResponse: function(response) {
+  handleResponse: function(response, status, xhr) {
+    // Generally we expect JSON, otherwise we assume user knows what they are doing
+    var ct = xhr.getResponseHeader("content-type") || "";
+    // Capybara::Poltergeist::JavascriptError with ES6 startsWith :(
+    if (ct.indexOf("text/javascript") === 0)
+      return;
     if (typeof response === "string")
       response = JSON.parse(response);
 

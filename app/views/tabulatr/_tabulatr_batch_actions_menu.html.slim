@@ -31,12 +31,15 @@
           - label     = data
           - download  = false
           - extension = nil
+          - id = nil
         - else
           - label    = data[:text]
           - download = !!data[:download]
           - extension = data[:extension]
+          - id = data[:id]
         li
-          = link_to label, '#', class: "batch-action-inputs", data: { \
+          = link_to label, '#', id: id, class: "batch-action-inputs",
+            data: { \
               "turbolinks" => false, \
               "do-batch-action-name" => iname, \
               "do-batch-action" => key, \
