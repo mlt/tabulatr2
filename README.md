@@ -237,8 +237,9 @@ the user submits the filter form.
 </div>
 ```
 
-As you can see there are two locales defined which should be used for your custom form
-field: `input_name` and `input_id`
+As you can see there are two locals defined which should be used for your custom form
+field: `input_name` and `input_id`. You can have multiple inputs with the same `input_name`.
+In this case, `value` will be an array containing submitted values in the order input field are defined.
 
 ### Row formatting
 
