@@ -49,6 +49,10 @@
                   label.control-label for=filter_name
                     = column.col_options.filter_label || column.human_name
 
+                  - if column.filter.is_a?(Method)
+                    - column.col_options.filter = column.filter.call(klass, column)
+                  - elsif column.filter.respond_to? :call
+                    - column.col_options.filter = column.filter.call(klass)
                   - if column.filter.is_a?(Hash) || column.filter.is_a?(Array) || column.filter.is_a?(String)
                     select.form-control.no-chosen id=name name=iname
                       - if column.filter.class.is_a?(String)
