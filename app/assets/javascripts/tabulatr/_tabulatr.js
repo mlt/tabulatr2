@@ -3,7 +3,6 @@ function Tabulatr(id){
   this.name = '';
   this.moreResults = true;
   this.currentData = null;
-  this.locked = false;
   this.isAPersistedTable = false;
   this.initialRequest = true;
   this.hasInfiniteScrolling = false;
@@ -15,8 +14,8 @@ Tabulatr.prototype = {
   updateTable: function(hash, forceReload) {
     var $table = $('#'+ this.id);
     this.storePage = this.pageShouldBeStored(hash.page, forceReload);
-    if((this.storePage && this.retrievePage($table, hash)) || this.locked){ return; }
-    this.locked = true;
+    if((this.storePage && this.retrievePage($table, hash)) ||
+      $table.parents('.tabulatr-outer-wrapper').hasClass('locked')){ return; }
     this.showLoadingSpinner();
     this.loadDataFromServer(hash);
   },
@@ -130,8 +129,7 @@ Tabulatr.prototype = {
 
   handleError: function(){
     if(this.isAPersistedTable && this.initialRequest){
-      this.initialRequest = false;
-      this.locked = false;
+      this.hideLoadingSpinner();
       this.resetTable();
     }
   },
@@ -226,13 +224,12 @@ Tabulatr.prototype = {
   },
 
   showLoadingSpinner: function(){
-    $('.tabulatr-spinner-box[data-table="'+ this.id +'"]').show();
+    $('.tabulatr-outer-wrapper[data-table-id="' + this.id + '"]').addClass('locked');
   },
 
   hideLoadingSpinner: function(){
     this.initialRequest = false;
-    this.locked = false;
-    $('.tabulatr-spinner-box[data-table="'+ this.id +'"]').hide();
+    $('.tabulatr-outer-wrapper[data-table-id="' + this.id + '"]').removeClass('locked');
   },
 
   updateInfoString: function(tableId, response){
