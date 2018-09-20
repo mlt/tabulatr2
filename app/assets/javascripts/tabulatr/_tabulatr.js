@@ -11,6 +11,13 @@ function Tabulatr(id){
 Tabulatr.prototype = {
   constructor: Tabulatr,
 
+  refreshPage: function() {
+    var p = $('.pagination[data-table="' + this.id + '"]>.active>a').data('page');
+    if (typeof(p) == undefined)
+      p = 1;
+    this.updateTable({page: p}, true);
+  },
+
   updateTable: function(hash, forceReload) {
     var $table = $('#'+ this.id);
     this.storePage = this.pageShouldBeStored(hash.page, forceReload);
