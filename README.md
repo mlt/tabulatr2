@@ -1,447 +1,93 @@
-# Tabulatr2 - Index Tables made easy
-[![Gem Version](https://badge.fury.io/rb/tabulatr2.png)](http://badge.fury.io/rb/tabulatr2)
-[![Code Climate](https://codeclimate.com/github/metaminded/tabulatr2.png)](https://codeclimate.com/github/metaminded/tabulatr2)
-[![Travis CI](https://api.travis-ci.org/metaminded/tabulatr2.png)](https://travis-ci.org/metaminded/tabulatr2)
+# Tabulatr2 (modified)
 
-## Requirements
+This is a work-in-progress branch with my (mlt) modifications on top of original tabulatr2
+that have not been merged (yet?). This branch is mostly for my own amusement but you may find it useful.
+This is not a full blown fork and I hope the changes will make their way back.
 
-* Ruby 2.0.0 or higher
-* Rails 4.0.0 or higher
-* [Bootstrap from Twitter](http://getbootstrap.com)
+Please note, that I do rebase this branch often in an attempt to keep it tidy and ease cherry picking for merges.
+**Do not fork it** unless you are really good with git and are comfortable rebasing and cherry picking.
+Create an issue if you feel like working along, so I'll start a permanent development branch.
+And don't create any issues here pertinent to main tabulatr2 code base.
 
-## Installation
+Prominent changes include:
 
-Require tabulatr2 in your Gemfile:
-```ruby
-gem 'tabulatr2'
-```
-After that run `bundle install`.
+- Works with Turbolinks
+- Changeable records per page
+- Cancellable pre-filter and filter dialog reset to defaults
+- In-place editing with [x-editable](http://vitalets.github.io/x-editable/)
+- Callable filter
+- Support for chained associations
+- Partial DSL for complex cell rendering
 
-Also add `//= require tabulatr` to your application js file and `*= require tabulatr` to your CSS asset
-pipeline. Make sure to add it after including the `bootstrap` assets.
+## Turbolinks and friends
 
-In order to get the provided `i18n` language files run
-`rails g tabulatr:install`
+JavaScript code was re-written using bubbled to *document* events. Tabulatr object is saved into `$('table#whatever').data('tabulatr')` upon instantiation. This allows to have, e.g. a `refreshPage` method exposed.
 
-## Example
-
-![example](https://cloud.githubusercontent.com/assets/570608/5580201/661c63c0-9047-11e4-9993-f71a0f1f4c00.png)
-
-## The DSL
-
-`Tabulatr` provides an easy to use DSL to define the data to be used in your table. It is defined in `TabulatrData`
-classes. If you have a `User` model you would create a `UserTabulatrData` class.
+## Adjustable records per page
 
 ```ruby
-class UserTabulatrData < Tabulatr::Data
-end
+<%= table_for @a_relation, pagesizes: [10, 20, 50, 100, 9999] %>
 ```
 
-Instead of creating this class by hand you can also generate a `TabulatrData` for a given class by running
-`rails g tabulatr:table User`
+9999 stands for *All* on one page.
 
-### Columns
-
-Let's say you want to display each user's `first_name` and `last_name` attribute:
+## Cancellable pre-filter
 
 ```ruby
-class UserTabulatrData < Tabulatr::Data
-  column :first_name
-  column :last_name
-end
+<%= table_for @a_rel, filter: {'table_name_or_assoc:col': 'value'},...
 ```
-That's it. It'll work, but let's assume you would like to display the full name in one single column. No worries! `Tabulatr` got you covered:
+
+You might want to pre-filter records, but would like to allow an end user to see all records by cancelling filter dialog. Once filter is cancelled you might want to reset it to preset one. You will see an extra button ♻ for that to reset a form in filter dialog ❌♻🡺.
+
+## x-editable support & callable filter
+
+Define `self.editable?` method in your Tabulatr::Data that would return `true` when editing is allowed. Something like this would do it if you use [Pundit](https://github.com/varvet/pundit):
 
 ```ruby
-class UserTabulatrData < Tabulatr::Data
-  column :full_name, table_column_options: {header: 'The full name'} do |user|
-    link_to "#{user.first_name} #{user.last_name}", user
-  end
-end
-```
-As you can see you just need to provide a block to the `column` call and you can format the cell into whatever you want.
-You can even use all those fancy Rails helpers!
-
-Unfortunately, we can't sort and filter this column right now because `Tabulatr` would look for a `full_name` column in
-your DB table but there is no such thing. Bummer! Enter `sort_sql` and `filter_sql`:
-
-#### Sorting / Filtering
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  column :full_name, sort_sql: "users.first_name || '' || users.last_name",
-                   filter_sql: "users.first_name || '' || users.last_name"
-end
-```
-
-With these two options you can provide whatever SQL you would like to have executed when filtering or sorting
-this particular column. If instead you want to disable sorting and filtering at all, you can do that too:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  column :full_name, table_column_options: {sortable: false, filter: false}
-end
-```
-
-Also you are able to change generated filter form field for this column. Say for example you want to have an `exact`
-filter instead of a `LIKE` filter:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  column :first_name, table_column_options: {filter: :exact}
-end
-```
-
-Following is a table with all the standard mappings for filter fields, which means these filters get created if you
-don't overwrite it:
-
-Data type | Generated form field / SQL
---------- | -------------------------
-integer, float, decimal | String input field, exact match
-string, text            | String input field, LIKE match
-date, time, datetime, timestamp | Select field, with options like 'last 30 days', 'today', ...
-boolean                         | Select field, options are 'Yes', 'No' and 'Both'
-
-
-### Associations
-
-To display associations you would use the `association` method with the association name and the attribute on the
-association as it's first two arguments:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  association :citizenship, :name
-end
-```
-
-Associations take the same arguments as the `column` method:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  association :citizenship, :name do
-    record.citizenship.name.upcase
-  end
-
-  association :posts, :text, table_column_options: {filter: false, sortable: false} do |user|
-    user.posts.count
-  end
-end
-```
-
-### Checkbox
-
-To provide a checkbox for each row which is needed by batch actions just call `checkbox`:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
- checkbox
-end
-```
-
-### Actions
-
-To provide a column that's not sortable and filterable but renders something nice:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  action do |r|
-    link_to "edit", edit_product_path(r)
-  end
-end
-```
-
-### Buttons
-
-To render a fancy button group:
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  buttons do |b,r|
-    b.button :eye, product_path(r), class: 'btn-success'
-    b.button :pencil, edit_product_path(r), class: 'btn-warning'
-    b.submenu do |s|
-      s.button :star, star_product_path(r), label: 'Dolle Sache'
-      s.divider
-      s.button :'trash-o', product_path(r), label: 'Löschen', confirmation: 'echt?', class: 'btn-danger', method: :delete
-    end
-  end
-end
-```
-
-### Accessing controller
-
-You may want to show actions and/or buttons depending on a condition,
-e.g., user's role. You can access controller helpers with
-`@controller`. Here is how to check, if you are
-using [Pundit](https://github.com/elabs/pundit) (or any other
-authorization gem):
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  buttons do |b,r|
-    if @controller.policy(r).show?
-      b.button :eye, product_path(r), class: 'btn-success'
-    end
-  end
-end
-```
-
-### Search
-
-The DSL provides you with a `search` method to define a custom fuzzy search method which is not bound
-to a specific column.
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  search do |query|
-   "users.first_name LIKE '#{query}' OR users.last_name LIKE '#{query}' OR users.address LIKE '#{query}'"
-  end
-
-  # This call could also be written as:
-  # search :first_name, :last_name, :address
-end
-```
-
-### Custom filters
-
-You're also able to create custom filters with the `filter` method to create more advanced
-filters which are independent of the displayed columns.
-
-```ruby
-class UserTabulatrData < Tabulatr::Data
-  filter :age_range do |relation, value|
-    if value == 'upto_18'
-      relation.where("birthday > ?", Date.today-18.years)
-    elsif value == 'over_18'
-      relation.where("birthday <= ?", Date.today-18.years)
-    end
-  end
-end
-```
-
-This code will look for a partial to render in `tabulatr/filter/_age_range.*`.
-You can override this path by specifying the `partial` argument of the `filter` method.
-It will call it's block with the ActiveRecord::Relation and the submitted value after
-the user submits the filter form.
-
-```erb
-# tabulatr/filter/_age_range.html.erb
-
-<div class='form-group'>
-  <label class='control-label' for="<%= input_id %>">Age range</label>
-  <select id="<%= input_id %>" name="<%= input_name %>">
-    <option value=''>None</option>
-    <option value='upto_18'>0 - 17</option>
-    <option value='over_18'>18+</option>
-  </select>
-</div>
-```
-
-As you can see there are two locals defined which should be used for your custom form
-field: `input_name` and `input_id`. You can have multiple inputs with the same `input_name`.
-In this case, `value` will be an array containing submitted values in the order input field are defined.
-
-### Row formatting
-
-To provide row specific HTML-Attributes call `row`:
-
-```ruby
-row do |record, row_config|
-  if record.super_important?
-    row_config[:class] = 'important';
-  end
-  row_config[:data] = {
-    href: edit_user_path(record.id),
-    vip: record.super_important?
-  }
-end
-```
-
-## Usage
-
-Great, we have defined all the required `columns` in the TabulatrData DSL, but how do we display the table now?
-
-In `UsersController#index` we write:
-
-```ruby
-  def index
-    tabulatr_for User
-  end
-```
-This call responds to an HTML-Request by rendering the associated `view` and for a JSON-Request by
-fetching the requested records.
-
-
-_Hint:_ If you want to prefilter your table, you can do that too! Just pass an `ActiveRecord::Relation` to `tabulatr_for`:
-```ruby
-  def index
-    tabulatr_for User.where(active: true)
+  def self.editable?(view, name)
+    view.controller.policy(view.record).update?
   end
 ```
 
-In the view we can use all the attributes which are defined in our `UserTabulatrData` class.
-To display all the columns defined in the `UserTabulatrData` class we
-just need to put the following statement in our view:
-
-```erb
-<%= table_for User %>
-```
-If you just want do display a subset of the defined columns or show them in a
-different order you can provide them as arguments to the `columns` key:
-
-```erb
-<%= table_for User, columns: [:full_name, 'citizenship:name', {posts: :text}]%>
-```
-Note that you can write associations as a string with colon between association
-name and method or as a hash as you can see above.
-
-An other option is to provide the columns in a block:
-
-```erb
-  <%= table_for User do |t|
-    t.column :full_name
-    t.column :active
-    t.association :citizenship, :name
-    t.association :posts, :text
-    t.column :edit_link
-  end %>
-```
-
-To add a checkbox column just add
-```erb
-t.checkbox
-```
-
-To add a select box with batch-actions (actions that should be performed on all selected rows),
-we add an option to the table_for:
-
-```erb
-  <%= table_for User, batch_actions: {'foo' => 'Foo', 'delete' => "Delete"} do |t|
-    ...
-  end %>
-```
-
-To handle the actual batch action, we have to add a block to the `tabulatr_for` call in the controller:
+Now use *editable* column option to provide details.
 
 ```ruby
-  tabulatr_for User do |batch_actions|
-    batch_actions.delete do |ids|
-      ids.each do |id|
-        User.find(id).destroy
-      end
-      redirect_to root_path()
-      return
-    end
-    batch_actions.foo do |ids|
-      ... do whatever is foo-ish to the records
-    end
-  end
+  association :myassoc, :assoc_col, sortable: true,
+    editable: {url: :controller_where_to_send_updates_for_relation_path, type: :select2, select2: {
+      dropdownParent: '.popover', width: '20em', dropdownAutoWidth: true, theme: 'bootstrap'
+      }, source: Myassoc.order(:assoc_col).pluck(:assoc_col, :assoc_id).map{|v,i| {id: i, text: v}}},
+    filter: Proc.new {|k| k.distinct.where.not(assoc_col: nil).pluck :assoc_col}
 ```
 
-where the `ids` parameter to the block is actually an Array containing the numeric ids of the currently selected rows.
+If you prefer using ids in a match ...
 
+```
+...
+    filter: Proc.new {|k| k.distinct.where.not(assoc_col: nil).pluck :assoc_col, :assoc_id},
+    filter_sql: 'unambiguous_referencing_table_name.assoc_id'
+```
 
-## Features
+It is handy to show filter options that are applicable, e.g. remove entries yielding empty results.
+Therefore we use `Proc` here.
 
-Tabulatr aims at making the ever-recurring task of creating listings of ActiveRecord models simple and uniform.
+If *url* specification is omitted, the appropriate path for requests will be determined with the following logic. If *x-editable* type is select(2), patch HTTP call will update previous association (or main table). If *type* is set to something else, it will try to edit associated record. In latter case you might want to `$('table#whatever').data('tabulatr').refreshPage()` to reflect associated record update in other rows.
 
-We found ourselves reinventing the wheel in every project we made, by using
+Use `where.not(assoc_col: nil)` for [outer joins](https://stackoverflow.com/a/48965930/673826) to remove extra empty cell.
 
-* different paging mechanisms,
-* different ways of implementing filtering/searching,
-* different ways of implementing selecting and batch actions,
-* different layouts.
+## Chained associations
 
-We finally thought that whilst gems like Formtastic or SimpleForm provide a really cool, uniform
-and concise way to implement forms, it's time for a table builder.
-During a project with Magento, we decided that their general tables are quite reasonable,
-and enterprise-proven -- so that's our starting point.
-
-Tabulatr tries to make these common tasks as simple/transparent as possible:
-* paging
-* selecting/checking/marking
-* filtering
-* batch actions
-
-
-## Options
-
-
-### Table Options
-
-These options should be specified at the view level as parameters to the `table_for` call.
-They change the appearance and behaviour of the table.
+Use either of
 
 ```ruby
-  filter: true,          # false for no filter row at all
-  search: true,          # show fuzzy search field
-  paginate: false,       # true to show paginator
-  pagesize: 20,          # default pagesize
-  sortable: true,        # true to allow sorting (can be specified for every sortable column)
-  batch_actions: false,  # :name => value hash of batch action stuff
-  footer_content: false, # if given, add a <%= content_for <footer_content> %> before the </table>
-  path: '#',             # where to send the AJAX-requests to
-  order_by: nil          # default order,
-  html_class: ''         # html classes for the table element
-  counter_position: :top # position of the counter row, can by :top, :bottom or :both
+  association %i[assoc1 assoc2], :mycol, editable: true
+  association 'assoc1-assoc2', :mycol, editable: {type: 'textarea'}
+  association :'assoc1-assoc2', :mycol, editable: {type: :select}
 ```
 
-#### Example:
-```erb
-<%= table_for User, {order_by: 'last_name desc', pagesize: 50} %>
-```
-
-### Column Options
-
-You can specify these options either in your `TabulatrData` class or to
-the columns in the block of `table_for`.
+## Partial
 
 ```ruby
-  header: nil,           # override content of header cell
-  classes: nil,          # CSS classes for this column
-  width: false,
-  align: false,
-  valign: false,
-  wrap: nil,
-  th_html: false,
-  filter_html: false,
-  filter_label: nil,
-  filter: true,          # whether this column should be filterable
-  sortable: true,        # whethter this column should be sortable
-  format: nil,
-  map: true,
-  cell_style: {},        # CSS style for all body cells of this column
-  header_style: {}       # CSS style for all header cells of this column
+  partial :files, header: 'Latest'
 ```
 
-#### Example:
-```erb
-# in the view
-<%= table_for User do |t|
-  t.column(:first_name, header_style: {color: 'red'})
-  # ...
-%>
-
-# or in TabulatrData
-class UserTabulatrData < Tabulatr::Data
-  column(:first_name, table_column_options: {header_style: {color: 'red'}})
-end
-```
-
-## Contributing
-
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the Issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it, run them via `rspec spec` and check that they all pass.
-* Please try not to mess with the Rakefile, version, or history.
-  If you want to have your own version, or is otherwise necessary, that is fine,
-  but please isolate to its own commit so I can cherry-pick around it.
-* Feel free to send a pull request if you think others (me, for example) would like to have your change
-  incorporated into future versions of tabulatr.
-
-## License
-
-[MIT](LICENSE)
+Use so-named (`files` here) variable in your partial `views/whatever/_files.html.erb`.
