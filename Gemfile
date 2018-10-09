@@ -15,7 +15,8 @@ group :test do
   gem 'simplecov', :require => false
   gem 'selenium-webdriver'
   gem 'chromedriver-helper' if ENV['CI']
-  gem 'capybara-screenshot'
+  gem 'capybara-screenshot', github: 'mlt/capybara-screenshot', branch: 'gcs'
+  gem 'google-cloud-storage' if ENV['CI']
 end
 
 
