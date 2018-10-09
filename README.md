@@ -1,4 +1,7 @@
 # Tabulatr2 (modified)
+[![Build Status](https://travis-ci.com/mlt/tabulatr2.svg?branch=wip_mlt)](https://travis-ci.com/mlt/tabulatr2)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ba31d13164c4f5c73177/maintainability)](https://codeclimate.com/github/mlt/tabulatr2/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ba31d13164c4f5c73177/test_coverage)](https://codeclimate.com/github/mlt/tabulatr2/test_coverage)
 
 This is a work-in-progress branch with my (mlt) modifications on top of original tabulatr2
 that have not been merged (yet?). This branch is mostly for my own amusement but you may find it useful.
