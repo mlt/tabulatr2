@@ -32,6 +32,18 @@ Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
   "screenshot_#{example.description.gsub(' ', '-').gsub(/^.*\/spec\//,'')}"
 end
 
+if ENV['CI']
+  Capybara::Screenshot.gcs_configuration = {
+    credentials: 'gcs_credentials.json',
+    bucket_name: "jksdhgjkdhgjkd",
+  }
+
+  Capybara::Screenshot.gcs_object_configuration = {
+    content_encoding: 'gzip',
+    acl: 'public_read'
+  }
+end
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("../support/**/*.rb")].each { |f| require f }
