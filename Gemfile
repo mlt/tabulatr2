@@ -25,8 +25,9 @@ end
 
 group :development, :test do
   if defined?(JRUBY_VERSION)
-    gem 'activerecord-jdbc-adapter'
-    gem 'jdbc-sqlite3'
+    gem 'rails', '~> 4.2.10'
+    gem 'activerecord-jdbc-adapter', '~> 1.3.25'
+    gem 'activerecord-jdbcsqlite3-adapter'
   else
     gem 'sqlite3'
   end
