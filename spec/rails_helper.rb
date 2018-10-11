@@ -9,15 +9,11 @@ ActiveRecord::Migrator.migrate File.expand_path("../dummy/db/migrate/", __FILE__
 
 require 'rspec/rails'
 require 'capybara/rspec'
-require 'capybara/poltergeist'
 require 'spec_helper'
 
-Capybara.javascript_driver = :poltergeist
+Capybara.javascript_driver = :selenium_chrome_headless
 Capybara.server = :webrick
 
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {js_errors: true})
-end
 
 
 # Requires supporting ruby files with custom matchers and macros, etc,
