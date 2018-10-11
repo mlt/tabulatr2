@@ -109,7 +109,8 @@ feature "Tabulatr" do
           Product.create!
         end
         visit one_item_per_page_with_pagination_products_path
-        wait_for_ajax
+        # https://robots.thoughtbot.com/write-reliable-asynchronous-integration-tests-with-capybara#interact-with-all-matching-elements
+        find('.pagination li a[data-page]', match: :first)
         pages = page.all('.pagination li a[data-page]').map{|a| a['data-page'].to_i}
         expect(pages).to match_array([1,2,3,10,20])
       end
@@ -133,6 +134,7 @@ feature "Tabulatr" do
       visit simple_index_products_path
       click_link 'Filter'
       fill_in("product_filter[products:title][like]", with: "ore")
+      find('a.tabulatr-submit-table').click
       expect(page).to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'lorem')
       expect(page).to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'labore')
       expect(page).to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'dolore')
@@ -140,6 +142,7 @@ feature "Tabulatr" do
       within(".tabulatr_filter_form") do
         fill_in("product_filter[products:title][like]", :with => "loreem")
       end
+      find('a.tabulatr-submit-table').click
       expect(page).not_to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'lorem')
       expect(page).not_to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'labore')
       expect(page).not_to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'dolore')
@@ -151,6 +154,7 @@ feature "Tabulatr" do
       visit simple_index_products_path
       click_link 'Filter'
       find('form.tabulatr_filter_form').fill_in("product_filter[vendor:name]", with: "producer")
+      find('a.tabulatr-submit-table').click
       expect(page).not_to have_selector('td[data-tabulatr-column-name="vendor:name"]', text: @vendor1.name)
       expect(page).to have_selector('td[data-tabulatr-column-name="vendor:name"]', text: @vendor2.name)
     end
@@ -168,18 +172,16 @@ feature "Tabulatr" do
       click_link 'Filter'
       within('.tabulatr_filter_form') do
         fill_in("product_filter[products:price][from]", :with => 4)
-        wait_for_ajax
         fill_in("product_filter[products:price][to]", :with => 10)
-        wait_for_ajax
+        find('a.tabulatr-submit-table').click
       end
       expect(page).to have_no_css('.tabulatr-spinner-box')
       expect(page).to have_css(".tabulatr_table tbody tr", text: 'foo')
       expect(page).to have_no_css(".tabulatr_table tbody tr", text: 'bar')
       within('.tabulatr_filter_form') do
         fill_in("product_filter[products:price][from]", :with => 12)
-        wait_for_ajax
         fill_in("product_filter[products:price][to]", :with => 19)
-        wait_for_ajax
+        find('a.tabulatr-submit-table').click
       end
       expect(page).to have_no_css('.tabulatr-spinner-box')
       expect(page).to have_css(".tabulatr_table tbody tr", text: 'bar')
@@ -215,6 +217,7 @@ feature "Tabulatr" do
       click_link 'Filter'
       within(".tabulatr_filter_form") do
         fill_in("product_filter[products:title][like]", with: "foo")
+        find('a.tabulatr-submit-table').click
       end
       expect(page).not_to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'bar')
       expect(page).to have_selector('td[data-tabulatr-column-name="products:title"]', text: 'foo')
@@ -239,6 +242,7 @@ feature "Tabulatr" do
       end
       expect(page).to have_css(".tabulatr_table tbody tr", count: 1)
       expect(page).to have_css('.tabulatr_table tbody td', text: @vendor1.name)
+      find('a.tabulatr-reset-table').click
     end
 
     scenario 'custom split filters', js: true do
@@ -256,8 +260,8 @@ feature "Tabulatr" do
       within(".tabulatr_filter_form") do
         select("Cheap", from: "vendor_filter[product_price_range]")
       end
-#      wait_for_ajax
-      expect(page).to have_css(".tabulatr_table tbody tr", count: 0, wait: 10)
+      expect(page).to have_no_css(".tabulatr_table tbody tr")
+      find('a.tabulatr-reset-table').click
     end
 
     scenario 'pre-filter', js: true do
@@ -338,8 +342,8 @@ feature "Tabulatr" do
       product3 = Product.create!(:title => names[2], :active => true, :price => 10.0)
       visit with_batch_actions_products_path
       expect(page).to have_css(".tabulatr_table tbody tr", count: 3)
-      find(".tabulatr-checkbox[value='#{product1.id}']").trigger('click')
-      find(".tabulatr-checkbox[value='#{product3.id}']").trigger('click')
+      find(".tabulatr-checkbox[value='#{product1.id}']").click
+      find(".tabulatr-checkbox[value='#{product3.id}']").click
       find('.tabulatr-batch-actions-menu-wrapper a').click
       within('.dropdown.open') do
         click_link 'Delete'
@@ -356,6 +360,7 @@ feature "Tabulatr" do
       within('.dropdown.open') do
         click_link 'Delete'
       end
+      page.driver.browser.switch_to.alert.accept
       expect(page).to have_css('.tabulatr_table tbody tr', count: 0)
     end
   end
@@ -368,8 +373,8 @@ feature "Tabulatr" do
       header = find(".tabulatr_table thead th[data-tabulatr-column-name='products:title']")
       cell_without_style   = find(".tabulatr_table tbody td[data-tabulatr-column-name='products:price']")
       header_without_style = find(".tabulatr_table thead th[data-tabulatr-column-name='products:price']")
-      expect(cell[:style]).to eql 'background-color: green;text-align: left;width: 60px;white-space: nowrap;'
-      expect(header[:style]).to eql 'color: orange;text-align: left;width: 60px;white-space: nowrap;'
+      expect(cell).to match_css '[style="background-color: green;text-align: left;width: 60px;white-space: nowrap;"]'
+      expect(header).to match_css '[style="color: orange;text-align: left;width: 60px;white-space: nowrap;"]'
       expect(cell_without_style[:style]).to be_empty
       expect(header_without_style[:style]).to be_empty
     end
