@@ -15,6 +15,7 @@ group :test do
   gem 'simplecov', :require => false
   gem 'selenium-webdriver'
   gem 'chromedriver-helper' if ENV['CI']
+  gem 'capybara-screenshot'
 end
 
 
