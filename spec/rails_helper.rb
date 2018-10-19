@@ -5,12 +5,27 @@ SimpleCov.start do
 end
 
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
-ActiveRecord::Migrator.migrate File.expand_path("../dummy/db/migrate/", __FILE__)
+if ActiveRecord.version.release() < Gem::Version.new('5.2.0')
+  ActiveRecord::Migrator.migrate File.expand_path("../dummy/db/migrate_42/", __FILE__)
+else
+  begin
+    # https://github.com/rails/rails/issues/22261
+    ActiveRecord::Migration.maintain_test_schema!
+  rescue ActiveRecord::PendingMigrationError => e
+    puts e.to_s.strip
+    exit 1
+  end
+end
 
 require 'rspec/rails'
 require 'capybara/rspec'
 require 'capybara-screenshot/rspec'
+require 'database_cleaner'
 require 'spec_helper'
+if ENV['CI']
+  require 'chromedriver-helper'
+  require 'google-cloud-storage'
+end
 
 Capybara.javascript_driver = :chrome # :selenium_chrome_headless
 Capybara.server = :webrick

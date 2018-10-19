@@ -1,4 +1,4 @@
-class AddPublishAtToProducts < ActiveRecord::Migration[4.2]
+class AddPublishAtToProducts < ActiveRecord::Migration
   def change
     add_column :products, :publish_at, :datetime
   end

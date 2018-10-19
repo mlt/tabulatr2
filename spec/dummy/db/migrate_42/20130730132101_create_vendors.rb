@@ -1,6 +1,6 @@
-class CreateParents < ActiveRecord::Migration[4.2]
+class CreateVendors < ActiveRecord::Migration
   def change
-    create_table :parents do |t|
+    create_table :vendors do |t|
       t.string :name
       t.string :url
       t.boolean :active
@@ -8,6 +8,5 @@ class CreateParents < ActiveRecord::Migration[4.2]
 
       t.timestamps null: false
     end
-    add_reference :vendors, :parent, index: true
   end
 end

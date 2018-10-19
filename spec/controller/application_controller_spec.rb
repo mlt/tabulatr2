@@ -27,7 +27,11 @@ describe ApplicationController, type: :controller do
       ).and_return(fake_response)
       expect(fake_response).to receive(:to_tabulatr_json).and_return({})
 
-      get :index, pagesize: 20, arguments: 'products:title'
+      if ActiveRecord.version.release() < Gem::Version.new('5.2.0')
+        get :index, pagesize: 20, arguments: 'products:title'
+      else
+        get :index, params: {pagesize: 20, arguments: 'products:title'}
+      end
       expect(response.code).to eq '200'
     end
   end

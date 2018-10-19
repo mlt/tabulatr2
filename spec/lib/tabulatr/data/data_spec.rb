@@ -15,7 +15,7 @@ describe Tabulatr::Data do
   end
 
   it 'prefilters the result' do
-
+    Product.create([{title: 'foo', price: 5}, {title: 'bar', price: 10}, {title: 'fuzz', price: 7}])
     td = Tabulatr::Data.new(Product.where(price: 10))
     td.data_for_table(ActionController::Parameters.new(example_params))
     expect(td.instance_variable_get('@relation').to_sql).to match(/.+WHERE \"products\".\"price\" = 10.+/)
