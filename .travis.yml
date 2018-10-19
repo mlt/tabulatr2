@@ -13,6 +13,9 @@ rvm:
   -  2.4.4
   -  2.5.1
   -  jruby-9.2.0.0
+gemfile:
+  - gemfiles/rail_4.gemfile
+  - gemfiles/rails_5.gemfile
 cache:
   bundler: true
   directories:
