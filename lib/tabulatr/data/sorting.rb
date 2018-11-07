@@ -46,8 +46,8 @@ module Tabulatr::Data::Sorting
       else
         @relation = @relation.reorder(@default_order)
       end
-    else
-      @relation = @relation.reorder(Arel.sql "#{@table_name}.#{@base.primary_key} desc")
+    elsif !@relation.respond_to?(:order_values) or @relation.order_values.empty?
+      @relation = @relation.order(Arel.sql "#{@table_name}.#{@base.primary_key} desc")
     end
   end
 
