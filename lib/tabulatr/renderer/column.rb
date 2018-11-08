@@ -177,7 +177,16 @@ class Tabulatr::Renderer::Column
 
   def format_value(value, view)
     case self.col_options.format
-    when Symbol then view.send(col_options.format, value)
+    when UnboundMethod then
+      m = col_options.format.bind(value)
+      m.call
+    when Method then col_options.format.call(value)
+    when Symbol then
+      if proxy.respond_to?(col_options.format)
+        proxy.send(col_options.format, value)
+      else
+        view.send(col_options.format, value)
+      end
     when String then col_options.format % value
     when Proc   then col_options.format.(value)
     else value
