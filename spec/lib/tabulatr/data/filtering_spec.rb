@@ -263,7 +263,11 @@ describe Tabulatr::Data::Filtering do
       allow(fake_column).to receive_message_chain('col_options.filter_sql') { 'products.active'}
       expect{@dummy.apply_boolean_condition(fake_column, 'true')}.to_not raise_error
       sql =  @dummy.instance_variable_get('@relation').to_sql
-      expect(sql).to match(/WHERE \(products\.active = 't'\)/)
+      if ActiveRecord::Base.connection_config[:adapter].eql?('sqlite3')
+        expect(sql).to match(/WHERE \(products\.active = 1\)/)
+      else
+        expect(sql).to match(/WHERE \(products\.active = 't'\)/)
+      end
     end
   end
 
