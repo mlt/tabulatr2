@@ -1,21 +1,35 @@
 git:
   depth: 1
+services:
+  - postgresql
 branches:
   only:
     - wip_mlt
+    - rails6
 addons:
   chrome: stable
 env:
   global:
     - secure: "d0qFbD7GhsyaLgsulFD5tMMFHyuqAn8LrjC5DVOK6OvHx7T0Z9cjetzxxm+h+Gz5eAUfclS8d5P8iJQGRpVgwF+6EBoyLDAvJTCt7+N0FTTqsJwupQynfr3wtnqTbqQIsgAHB9kmz3WPoPztLbragOiFSZLMAkSOj3qKtpVwpeEmaXZe2r+dafrwWE7uFt+hnnLCxmSznGE+c8habCi+PTwtCmbUDkf4l68Nmvn7+iE11b9RVVRNGLNdfxQo85LL57dN/6midA3pL8djBkokPTjHrchA4mg1z9vR0KjW6iA6HdkSq/EtFRTVrFyJqHwuO0u8WIIQWlxmutEBLNpoTsgqQFxwUhVl3ymy/xZQWHCHCXf/+N+zitV8OWQrqx+vgb81QbHjsi1wGpMbOWODEaSfsLqQTnTeuhlFMmMWM97+PaPorou54x69QAO2wT5ip8NZBSv0l0p3/NS3ShEw2h6JuRmH3NTUH2dN5mMKkwGm3aJQNWOPYc+SNbW6p6+P75rzLisdHkAlV/hqh6K3dOVlau3/4H11mLI2mMEwIxrm+wbhhKfu/gyo6/YV6VoojF1Alqo14P5b9Vmm8V4+sP6m8DPEyi5AQtqXi+Rw+GKeYHPIeGIUY5vs0PzB4lG3eYKh/1bLWHtaXMXVW3fCKQnpYNGl3id/uzmKkRXSajA="
+    - JRUBY_OPTS="--debug"
+    - JAVA_OPTS="--add-opens java.base/sun.nio.ch=org.jruby.dist"
+# WARNING: Unknown module: org.jruby.core specified to --add-opens
 language: ruby
-rvm:
-  -  2.4.4
-  -  2.5.1
-  -  jruby-9.2.0.0
-gemfile:
-  - gemfiles/rail_4.gemfile
-  - gemfiles/rails_5.gemfile
+matrix:
+  include:
+  - rvm: 2.4
+    gemfile: gemfiles/rails_4.gemfile
+  - rvm: jruby-9.2.7.0
+    gemfile: gemfiles/rails_4.gemfile
+  - rvm: 2.6
+    gemfile: gemfiles/rails_5.gemfile
+  - rvm: jruby-9.2.7.0
+    gemfile: gemfiles/rails_5.gemfile
+  - rvm: 2.6
+    gemfile: gemfiles/rails_6.gemfile
+  # - rvm: 2.6
+  #   gemfile: gemfiles/rails_6.gemfile
+  #   env: RAILS_ENV=test_pg
 cache:
   bundler: true
   directories:
@@ -23,10 +37,14 @@ cache:
     - /home/travis/.chromedriver-helper/
 before_install:
   - openssl aes-256-cbc -K $encrypted_1be6b4981a28_key -iv $encrypted_1be6b4981a28_iv -in gcs_credentials.json.enc -out gcs_credentials.json -d
+  - gem uninstall bundler -a -x || true
+  - gem install bundler -v 1.11.2
+install: bundle _1.11.2_ install --jobs=3 --retry=3
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
+  - if [ "x$RAILS_ENV" == "xtest_pg" ]; then psql -c 'create database travis_ci_test;' -U postgres; bundle exec rake -f spec/dummy/Rakefile db:migrate; fi
 script: "bundle exec rspec spec"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

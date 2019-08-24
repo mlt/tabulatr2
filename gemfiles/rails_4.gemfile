@@ -4,11 +4,16 @@ source "https://rubygems.org"
 
 gem "jquery-rails"
 gem "turbolinks"
-gem "x-editable-rails", "~> 1.5.1"
-gem "coffee-rails", "~> 4.2.2"
+gem 'x-editable-rails', '~> 1.5.1'
+# x-editable-rails depends on coffee for some ajax form mumbo jumbo with data-model and more
+gem 'coffee-rails', '~> 4.2.2'
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'sqlite3', '~> 1.3.6', platforms: %i[mri mingw x64_mingw]
+# gem 'bundler', '>= 1.3.0', '< 2.0', platform: :jruby
+gem "rails-ujs"
 gem "rails", "~> 4.2.10"
 gem "activerecord-jdbc-adapter", "~> 1.3.25", platform: :jruby
+gem "activerecord-jdbcsqlite3-adapter", "< 50", platform: :jruby
 
 group :test do
   gem "capybara-screenshot", github: "mlt/capybara-screenshot", branch: "gcs"
