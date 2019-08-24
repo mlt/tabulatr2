@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 gemspec
 
-gem 'jquery-rails'
 gem 'turbolinks'
 gem 'x-editable-rails', '~> 1.5.1'
 # x-editable-rails depends on coffee for some ajax form mumbo jumbo with data-model and more
@@ -14,6 +14,6 @@ group :test do
 end
 
 group :development, :test do
-  gem 'sass-rails', '~> 5.0.7'
-  gem 'bootstrap-sass', '~> 3.0.3.0'
+  gem 'sass-rails'
+  gem 'bootstrap-sass'
 end

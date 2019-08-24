@@ -18,6 +18,10 @@ test:
   pool: 5
   timeout: 5000
 
+test_pg:
+  adapter: postgresql
+  database: travis_ci_test
+
 production:
   adapter: sqlite3
   database: db/production.sqlite3

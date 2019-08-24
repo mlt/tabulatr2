@@ -2,7 +2,11 @@
 <html>
 <head>
   <title>Dummy</title>
-  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <% if ActiveRecord.version.release() >= Gem::Version.new('6.0.0') %>
+    <%= stylesheet_link_tag    "application6", media: "all", "data-turbolinks-track" => true %>
+  <% else %>
+    <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <% end %>
   <% if ActiveRecord.version.release() < Gem::Version.new('5.2.0') %>
     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
   <% else %>

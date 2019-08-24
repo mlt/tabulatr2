@@ -9,15 +9,16 @@ gem 'x-editable-rails', '~> 1.5.1'
 gem 'coffee-rails', '~> 5.0.0'
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "rails-ujs"
-gem "rails", "~> 5.2.3"
+gem "rails", "~> 6.0.0"
+gem 'pg' if ENV["RAILS_ENV"].eql?('test_pg')
 
 group :test do
   gem "capybara-screenshot", github: "mlt/capybara-screenshot", branch: "gcs"
 end
 
 group :development, :test do
-  gem "sass-rails", "~> 5.0.7"
-  gem "bootstrap-sass", "~> 3.0.3.0"
+  gem "sass-rails", "~> 6.0.0"
+  gem "bootstrap-sass", "~> 3.4.1"
 end
 
 gemspec path: "../"
