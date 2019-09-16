@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'better_errors'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'selenium-webdriver'
-  s.add_development_dependency 'chromedriver-helper' if ENV['CI']
+  s.add_development_dependency 'webdrivers' if ENV['CI']
   s.add_development_dependency 'google-cloud-storage' if ENV['CI']
   if defined?(JRUBY_VERSION)
     s.add_development_dependency 'activerecord-jdbc-adapter'

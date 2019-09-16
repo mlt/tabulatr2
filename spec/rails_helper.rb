@@ -23,7 +23,7 @@ require 'capybara-screenshot/rspec'
 require 'database_cleaner'
 require 'spec_helper'
 if ENV['CI']
-  require 'chromedriver-helper'
+  require 'webdrivers/chromedriver'
   require 'google-cloud-storage'
 end
 
