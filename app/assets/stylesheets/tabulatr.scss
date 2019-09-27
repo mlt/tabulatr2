@@ -184,7 +184,7 @@
     width: 100%;
     width: -moz-available;          /* WebKit-based browsers will ignore this. */
     width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
-    width: fill-available;
+    width: stretch;
     height: 5em;
     margin-bottom: -5em;
     padding-top: 3em;
