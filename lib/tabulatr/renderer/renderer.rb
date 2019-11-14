@@ -123,12 +123,11 @@ class Tabulatr::Renderer
     end.flatten
   end
 
-  def get_data_class(name = '')
-    if name.present?
-      name.constantize.new(@klass)
-    else
-      "#{@klass.name}TabulatrData".constantize.new(@klass)
-    end
+  def get_data_class(name = nil)
+    name = "#{@klass.name}TabulatrData" if name.blank?
+    name = name.constantize if name.is_a?(String)
+
+    name.new(@klass)
   end
 
   def set_columns_and_filters(data_class, columns, filters, &block)

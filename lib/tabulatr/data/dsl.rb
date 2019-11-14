@@ -144,7 +144,7 @@ module Tabulatr::Data::DSL
 
   def target_class(name)
     s = name.to_s
-    @target_class = s.camelize.constantize rescue "There's no class `#{s.camelize}' for `#{self.name}'"
+    @target_class = s.camelize.safe_constantize
     @target_class_name = s.underscore
   end
 

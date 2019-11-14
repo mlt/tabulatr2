@@ -104,11 +104,11 @@ class Tabulatr::Data
   end
 
   def table_columns
-    self.class.instance_variable_get("@table_columns")
+    collect :@table_columns
   end
 
   def filters
-    self.class.instance_variable_get('@filters')
+    collect :@filters
   end
 
   def search?
@@ -153,6 +153,17 @@ class Tabulatr::Data
     # @relation = @relation.group("#{@table_name}.#{@base.primary_key}")
   end
 
+  private
+
+  def collect(variable)
+    self.class.ancestors.inject([]) do |cols, tdc|
+      if tdc < Tabulatr::Data
+        tc = tdc.instance_variable_get variable
+        cols += tc if tc
+      end
+      cols
+    end
+  end
 end
 
 require_relative './dsl'
