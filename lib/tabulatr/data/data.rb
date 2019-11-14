@@ -104,11 +104,23 @@ class Tabulatr::Data
   end
 
   def table_columns
-    self.class.instance_variable_get("@table_columns")
+    self.class.ancestors.inject([]) do |cols, tdc|
+      if tdc < Tabulatr::Data
+        tc = tdc.instance_variable_get(:@table_columns)
+        cols += tc if tc
+      end
+      cols
+    end
   end
 
   def filters
-    self.class.instance_variable_get('@filters')
+    self.class.ancestors.inject([]) do |cols, tdc|
+      if tdc < Tabulatr::Data
+        tc = tdc.instance_variable_get(:@filters)
+        cols += tc if tc
+      end
+      cols
+    end
   end
 
   def search?
