@@ -1,4 +1,15 @@
-$(function(){
+(function (root, factory) {
+    if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('jquery'), require('./_tabulatr'));
+    } else {
+        // Browser globals (root is window)
+        root.returnExports = factory(root.$, root.Tabulatr);
+  }
+}(typeof self !== 'undefined' ? self : this, function ($, Tabulatr) {
+
   Tabulatr.prototype.retrieveTableFromLocalStorage = function(response){
     try {
       var currentStorage = JSON.parse(localStorage[this.id]);
@@ -40,4 +51,6 @@ $(function(){
     $('.tabulatr_filter_form[data-table='+ this.id +'] input[name="'+ tableName +'_sort"]').val('');
     this.updateTable({page: 1}, true);
   };
-});
+
+  return Tabulatr;
+}));

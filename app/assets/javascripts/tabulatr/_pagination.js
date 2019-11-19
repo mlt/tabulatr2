@@ -1,3 +1,15 @@
+(function (root, factory) {
+    if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('jquery'));
+    } else {
+        // Browser globals (root is window)
+        root.TabulatrPagination = factory(root.$);
+  }
+}(typeof self !== 'undefined' ? self : this, function ($) {
+
 function TabulatrPagination(pageCount, tableId){
   this.pageCount = pageCount;
   this.tableId = tableId;
@@ -83,3 +95,6 @@ TabulatrPagination.prototype = {
     return pageToCompare > currentPage + 3 && pageToCompare < this.pageCount - 1;
   }
 }
+
+  return TabulatrPagination;
+}));

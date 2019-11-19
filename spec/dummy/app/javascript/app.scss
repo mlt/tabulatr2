@@ -1,0 +1,7 @@
+// https://stackoverflow.com/a/56034943/673826
+$icon-font-path: "../../fonts/bootstrap/" !default;
+// $bootstrap-sass-asset-helper: true;
+@import '~bootstrap-sass/assets/stylesheets/bootstrap.scss';
+@import '~tabulatr2_ui/app/assets/stylesheets/tabulatr.scss';
+@import '~x-editable/dist/bootstrap3-editable/css/bootstrap-editable';
+@import '~font-awesome/scss/font-awesome.scss';
