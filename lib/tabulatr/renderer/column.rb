@@ -72,10 +72,9 @@ class Tabulatr::Renderer::Column
 
   def value_for(record, view)
     val = value_for_imp(record, view)
-    editable_options = col_options.editable.is_a?(Hash) ? col_options.editable : {}
+    options = col_options.editable.is_a?(Hash) ? col_options.editable.with_indifferent_access : {}
     # .to_s ? somehow 'false' renders to nothing
     return "#{val}" unless col_options.editable and proxy.editable?(view, name.to_s)
-    options = X::Editable::Rails::Configuration.method_options_for(record, name).deep_merge(editable_options).with_indifferent_access
     want_select = options.has_key?(:type) and options[:type].to_sym.eql?(:select)
     # Typically we edit underlying association object unless we are selecting an item
     if association?

@@ -1,4 +1,14 @@
-(function($, window, document, undefined) {
+(function (root, factory) {
+    if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        factory(require('jquery'), require('./_tabulatr'));
+    } else {
+        // Browser globals (root is window)
+        factory(root.$, root.Tabulatr);
+  }
+}(typeof self !== 'undefined' ? self : this, function ($, Tabulatr) {
 
   $(document).on('inview', '.pagination_trigger.inview', function(event, isInView, visiblePartX, visiblePartY){
     if (isInView && visiblePartY !== 'top' && visiblePartY !== 'bottom') {
@@ -239,4 +249,4 @@ $(document).on('change', 'select[data-tabulatr-date-filter]', function() {
   }
 });
 
-})(jQuery, window, document);
+}));

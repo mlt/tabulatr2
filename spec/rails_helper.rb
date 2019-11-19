@@ -27,6 +27,7 @@ if ENV['CI']
   require 'google-cloud-storage'
 end
 
+Capybara.default_max_wait_time = 10
 Capybara.javascript_driver = :chrome # :selenium_chrome_headless
 Capybara.server = :webrick
 
