@@ -122,6 +122,7 @@ feature "Tabulatr" do
         end
         visit one_item_per_page_without_pagination_products_path
         expect(page).to have_no_css('.pagination li a')
+        expect(page).to have_css('tr[data-page="2"]')
       end
     end
   end
