@@ -124,6 +124,11 @@
     }
   }
 
+  .pagination_trigger{
+    width: 1px;
+    height: 1px;
+  }
+
   .tabulatr-table-controls-wrapper {
     display: block;
     padding-top: 10px;
@@ -146,14 +151,6 @@
       .pagination{
         margin: 10px 0;
         vertical-align: middle;
-      }
-
-      .pagination_trigger{
-        width: 1px;
-        height: 1px;
-        position: relative;
-        float: left;
-        opacity: 1;
       }
     }
 
