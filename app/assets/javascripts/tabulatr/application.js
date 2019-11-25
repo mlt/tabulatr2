@@ -1,5 +1,5 @@
+//= require ./jquery.inview.min
+//= require ./_pagination
 //= require ./_tabulatr
 //= require ./_storage
-//= require ./_pagination
 //= require ./_events
-//= require ./jquery.inview.min
