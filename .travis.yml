@@ -1,11 +1,7 @@
 git:
   depth: 1
-services:
-  - postgresql
-branches:
-  only:
-    - wip_mlt
-    - rails6
+# services:
+#   - postgresql
 addons:
   chrome: stable
 env:
@@ -17,6 +13,9 @@ env:
 language: ruby
 matrix:
   include:
+  - rvm: 2.6
+    gemfile: gemfiles/rails_5_wp.gemfile
+    env: WEBPACKER=1
   - rvm: 2.4
     gemfile: gemfiles/rails_4.gemfile
   - rvm: jruby-9.2.7.0
@@ -32,7 +31,9 @@ matrix:
   #   env: RAILS_ENV=test_pg
 cache:
   bundler: true
+  yarn: true
   directories:
+    - node_modules
     - /home/travis/.rvm/
     - /home/travis/.chromedriver-helper/
 before_install:
@@ -45,6 +46,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   - if [ "x$RAILS_ENV" == "xtest_pg" ]; then psql -c 'create database travis_ci_test;' -U postgres; bundle exec rake -f spec/dummy/Rakefile db:migrate; fi
+  - if [ "$WEBPACKER" ]; then nvm use 11 && yarn && yarn link && yarn link tabulatr2_ui; fi
 script: "bundle exec rspec spec"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
