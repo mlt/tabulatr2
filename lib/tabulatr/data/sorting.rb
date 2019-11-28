@@ -56,7 +56,7 @@ module Tabulatr::Data::Sorting
       if sort_sql.respond_to? :call
         @relation = sort_sql.call(@relation, orientation, "#{@table_name}.#{@base.primary_key}", @base)
       else
-        @relation = @relation.reorder(Arel.sql "#{sort_sql} #{orientation}, #{@table_name}.id desc")
+        @relation = @relation.reorder(Arel.sql "#{sort_sql} #{orientation}, #{@table_name}.#{@base.primary_key} desc")
       end
   end
 
