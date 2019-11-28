@@ -9,3 +9,6 @@ log
 .rake_tasks~
 tabulatr2*.gem
 coverage
+doc
+node_modules
+spec/dummy/public/packs*
