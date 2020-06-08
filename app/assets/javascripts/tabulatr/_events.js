@@ -174,7 +174,7 @@
     var tbl = $('table#' + tableId);
     tbl.data('pagesize', event.target.value);
     var table_obj = tbl.data('tabulatr');
-    table_obj.resetTable();
+    table_obj.submitFilterForm();
   });
 
   $(document).on('ready page:load turbolinks:load', function(event){
