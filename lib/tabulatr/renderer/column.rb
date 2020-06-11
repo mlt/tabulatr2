@@ -87,12 +87,14 @@ class Tabulatr::Renderer::Column
     # .to_s ? somehow 'false' renders to nothing
     return "#{formatted}" unless col_options.editable and proxy.editable?(view, name.to_s)
     want_select = options.has_key?(:type) and options[:type].to_sym.eql?(:select)
+    name_editable = name
     # Typically we edit underlying association object unless we are selecting an item
     if association?
       assoc = table_name.to_s.split('-').map(&:to_sym)
       a = assoc.pop if want_select
       record = assoc.reduce(record) { |cur,nxt| cur.try(:send, nxt) }
       if want_select
+        name_editable = record.class.reflect_on_association(a).foreign_key
         val = record.try(a).try(:id)
         source = options.delete(:source)
         if source
@@ -120,7 +122,7 @@ class Tabulatr::Renderer::Column
       id: name,
       :data => {
                 url: url,
-                name: name,
+                name: name_editable,
                 pk: record.id,
                 title: title,
                 placeholder: placeholder,
