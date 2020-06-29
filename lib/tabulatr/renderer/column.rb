@@ -86,7 +86,7 @@ class Tabulatr::Renderer::Column
     options = col_options.editable.is_a?(Hash) ? col_options.editable.with_indifferent_access : {}
     # .to_s ? somehow 'false' renders to nothing
     return "#{formatted}" unless col_options.editable and proxy.editable?(view, name.to_s)
-    want_select = options.has_key?(:type) and options[:type].to_sym.eql?(:select)
+    want_select = options.has_key?(:type) && options[:type].to_sym.eql?(:select)
     name_editable = name
     # Typically we edit underlying association object unless we are selecting an item
     if association?
